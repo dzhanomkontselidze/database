@@ -11,16 +11,18 @@ const pool = new Pool({
 const initializeDatabase = async () => {
     console.log('Initializing database, bzzzzzzzzzzzz...');
     
+    // Виправив назву таблиці на cars, додав типи для price та назву для BOOLEAN
     const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS students (
+    CREATE TABLE IF NOT EXISTS cars (
         id SERIAL PRIMARY KEY,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        group_name TEXT NOT NULL,
-        life_problems TEXT NOT NULL,
-        additional_info TEXT,
-        hobby TEXT,
-        is_active BOOLEAN DEFAULT TRUE,
+        car_brand TEXT NOT NULL,
+        car_model TEXT NOT NULL,
+        engine_type TEXT NOT NULL,
+        horsepower TEXT NOT NULL,
+        weight TEXT,
+        acceleration_0_to_100 TEXT,
+        price TEXT, 
+        is_available BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     `;
@@ -35,18 +37,19 @@ const initializeDatabase = async () => {
 };
 
 async function addInfo() {
-    console.log('Adding student info...');
+    console.log('Adding cars info...');
     const insertQuery = `
-        INSERT INTO students (first_name, last_name, group_name, life_problems, additional_info, hobby) 
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO cars (car_brand, car_model, engine_type, horsepower, weight, acceleration_0_to_100, price) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
     const values = [
-        'Dzhano', 
-        'Konzelidze', 
-        'IPZs-25-1', 
-        'to understand programming', 
-        'video-editor, but for some reason decided to learn programming', 
-        'making cinematics, and virtual photos'
+        'Tuthill', 
+        '911K', 
+        '3.1L Flat-6', 
+        '350hp at 11K RPM', 
+        '850KG', 
+        '3.4s', 
+        '$1.1mil'
     ];
     
     await pool.query(insertQuery, values);
@@ -54,37 +57,32 @@ async function addInfo() {
 
 async function getData() {
     console.log("Fetching data from database...");
-    const { rows } = await pool.query('SELECT * FROM students');
+    const { rows } = await pool.query('SELECT * FROM cars');
     
     if (rows.length === 0) {
         console.log("The table is empty. 📭");
     } else {
         console.log("Rows =>");
-        console.table(rows); // Виведе гарну табличку в консоль
+        console.table(rows); 
     }
 }
 
 async function run() {
     try {
-        // 1. Очищаємо стару таблицю, щоб уникнути конфліктів структури
         console.log('Dropping old table to refresh structure...');
-        await pool.query('DROP TABLE IF EXISTS students');
+        await pool.query('DROP TABLE IF EXISTS cars');
 
-        // 2. Створюємо нову таблицю
         await initializeDatabase();
 
-        // 3. Додаємо дані
         await addInfo();
 
-        // 4. Виводимо результат
         await getData();
 
     } catch (err) {
         console.error("Everything went wrong! 💀", err.message);
     } finally {
-        // Закриваємо підключення, щоб скрипт завершився сам
         await pool.end();
-        console.log("Connection closed. Bye-bye! 👋");
+        console.log("Connection closed. Vroom-vroom! 🏎️💨");
     }
 }
 
