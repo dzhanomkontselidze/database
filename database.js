@@ -54,16 +54,26 @@ async function deleteInfo(id) {
     }
 }
 
-async function updatePrice(id, newPrice) {
-    if (!id || !newPrice) {
-        console.error("Помилка: Треба вказати ID та нову ціну.");
+async function updateField(id, column, newValue) {
+    if (!id || !column || !newValue) {
+        console.error("Помилка: Треба вказати ID, назву колонки та нове значення.");
         return;
     }
-    const result = await pool.query('UPDATE cars SET price = $1 WHERE id = $2', [newPrice, id]);
+    const allowedColumns = ['car_brand', 'car_model', 'engine_type', 'horsepower', 'weight', 'acceleration_0_to_100', 'price'];
+    
+    if (!allowedColumns.includes(column)) {
+        console.error(`Помилка: Колонки '${column}' не існує або її не можна змінювати.`);
+        return;
+    }
+
+    const updateQuery = `UPDATE cars SET ${column} = $1 WHERE id = $2`;
+    
+    const result = await pool.query(updateQuery, [newValue, id]);
+
     if (result.rowCount === 0) {
-        console.log(`Авто з ID ${id} не знайдено.`);
+        console.log(`Машину з ID ${id} не знайдено.`);
     } else {
-        console.log(`Ціна для ID ${id} тепер: ${newPrice}`);
+        console.log(`Успішно оновлено поле '${column}' для авто з ID ${id} на '${newValue}'!`);
     }
 }
 
@@ -82,10 +92,34 @@ async function run() {
 
     try {
         switch (command) {
-            case 'help':
-                console.log("📖 Команди: list, init, add [7 параметрів], delete [id], update [id] [ціна]");
-                break;
+case 'help':
+                console.log("\n" + "=".repeat(50));
+                console.log("🏎️  CAR DATABASE MANAGER v1.0  🏎️");
+                console.log("=".repeat(50));
+                console.log("\n📌 ДОСТУПНІ КОМАНДИ:");
+                
+                console.log("\n  📂 ПЕРЕГЛЯД:");
+                console.log("    node database.js list          -> Показати всі авто у таблиці");
+                
+                console.log("\n  ➕ ДОДАВАННЯ:");
+                console.log("    node database.js add [brand] [model] [engine] [hp] [weight] [accel] [price]");
+                console.log("    💡 Порада: Якщо значення з пробілами, бери його в \"лапки\"");
 
+                console.log("\n  🔧 КЕРУВАННЯ:");
+                console.log("    node database.js update [id] [field] [value] -> Оновити дані");
+                console.log("    node database.js delete [id]                 -> Видалити авто з бази");
+                
+                console.log("\n  ⚙️  СИСТЕМНІ:");
+                console.log("    node database.js init          -> Скинути базу та створити заново");
+                console.log("    node database.js help          -> Показати це меню");
+
+                console.log("\n📝 ДОСТУПНІ ПОЛЯ ДЛЯ UPDATE:");
+                console.log("   car_brand, car_model, engine_type, horsepower,");
+                console.log("   weight, acceleration_0_to_100, price");
+                
+                console.log("\n" + "=".repeat(50) + "\n");
+                break;
+                
             case 'list':
                 await getData(); 
                 break;
@@ -107,9 +141,11 @@ async function run() {
                 break;
 
             case 'update':
-                await updatePrice(process.argv[3], process.argv[4]);
-                break;
-
+            const id = process.argv[3];
+            const column = process.argv[4];
+            const value = process.argv[5];  
+            await updateField(id, column, value);
+            break;
             default:
                 console.log("Невідома команда. Спробуй 'node database.js help'");
         }
