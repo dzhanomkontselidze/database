@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 const initializeDatabase = async () => {
-    console.log('Initializing database, bzzzzzzzzzzzz...');
+    console.log('Initializing database.');
     const createTableQuery = `
     CREATE TABLE IF NOT EXISTS cars (
         id SERIAL PRIMARY KEY,
@@ -25,7 +25,7 @@ const initializeDatabase = async () => {
     );
     `;
     await pool.query(createTableQuery);
-    console.log('Database table initialized successfully, hurray!!!🗣️🔥');
+    console.log('Database table initialized successfully.');
 };
 
 async function addInfo(data) {
@@ -81,7 +81,7 @@ async function updateField(id, column, newValue) {
 async function getData() {
     const { rows } = await pool.query('SELECT * FROM cars ORDER BY id ASC');
     if (rows.length === 0) {
-        console.log("📭 База порожня.");
+        console.log("База порожня.");
     } else {
         console.table(rows); 
     }
@@ -94,26 +94,26 @@ async function run() {
         switch (command) {
 case 'help':
                 console.log("\n" + "=".repeat(50));
-                console.log("🏎️  CAR DATABASE MANAGER v1.0  🏎️");
+                console.log("  CAR DATABASE MANAGER v1.0  ");
                 console.log("=".repeat(50));
-                console.log("\n📌 ДОСТУПНІ КОМАНДИ:");
+                console.log("\n ДОСТУПНІ КОМАНДИ:");
                 
-                console.log("\n  📂 ПЕРЕГЛЯД:");
+                console.log("\n   ПЕРЕГЛЯД:");
                 console.log("    node database.js list          -> Показати всі авто у таблиці");
                 
-                console.log("\n  ➕ ДОДАВАННЯ:");
+                console.log("\n   ДОДАВАННЯ:");
                 console.log("    node database.js add [brand] [model] [engine] [hp] [weight] [accel] [price]");
-                console.log("    💡 Порада: Якщо значення з пробілами, бери його в \"лапки\"");
+                console.log("     Порада: Якщо значення з пробілами, бери його в \"лапки\"");
 
-                console.log("\n  🔧 КЕРУВАННЯ:");
+                console.log("\n   КЕРУВАННЯ:");
                 console.log("    node database.js update [id] [field] [value] -> Оновити дані");
                 console.log("    node database.js delete [id]                 -> Видалити авто з бази");
                 
-                console.log("\n  ⚙️  СИСТЕМНІ:");
+                console.log("\n    СИСТЕМНІ:");
                 console.log("    node database.js init          -> Скинути базу та створити заново");
                 console.log("    node database.js help          -> Показати це меню");
 
-                console.log("\n📝 ДОСТУПНІ ПОЛЯ ДЛЯ UPDATE:");
+                console.log("\n ДОСТУПНІ ПОЛЯ ДЛЯ UPDATE:");
                 console.log("   car_brand, car_model, engine_type, horsepower,");
                 console.log("   weight, acceleration_0_to_100, price");
                 
@@ -150,11 +150,11 @@ case 'help':
                 console.log("Невідома команда. Спробуй 'node database.js help'");
         }
     } catch (err) {
-        console.error("💀 Помилка:", err.message);
+        console.error(" Помилка:", err.message);
     } finally {
         await pool.end();
-        console.log("🔌 З'єднання закрите.🏎️💨");
+        console.log(" З'єднання закрите.");
     }
 }
 
-run();
+run(); 
